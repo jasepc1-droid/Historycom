@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Study — Quick Review</title>
+  <title>Study — Quick Review: Ancient Civilizations</title>
+  <meta name="description" content="Interactive study notes and timed review for World History Chapter 3. Includes key terms, timeline, and practice questions." />
+  <meta name="robots" content="noindex, nofollow" />
   <style>
     :root{ --bg:#f7fafc; --card:#ffffff; --muted:#64748b; --accent:#2563eb; font-family:system-ui,Segoe UI,Roboto,Arial; color-scheme: light; }
     html,body{height:100%;margin:0;background:linear-gradient(180deg,#e6eefc,#f8fbff); color:#0b1220}
@@ -16,28 +18,34 @@
     .btn{display:inline-block;padding:10px 14px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:700;cursor:pointer;text-decoration:none}
     .btn-ghost{background:transparent;border:1px solid rgba(37,99,235,0.12);color:var(--accent);padding:8px 12px;border-radius:8px}
     .hint{color:var(--muted);font-size:0.9rem;margin-top:10px}
+    .loader{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.95);z-index:9999;justify-content:center;align-items:center;flex-direction:column;font-size:1.1rem;color:#1e293b}
+    .loader::after{content:'';width:40px;height:40px;border:4px solid #e2e8f0;border-top-color:var(--accent);border-radius:50%;animation:s 1s linear infinite;margin-top:16px}
+    @keyframes s{to{transform:rotate(360deg)}}
     @media (max-width:880px){ .content{grid-template-columns:1fr} .wrap{margin:0;border-radius:0;box-shadow:none} }
   </style>
 </head>
 <body>
+  <div class="loader" id="loader">
+    <div>Loading study resource...</div>
+  </div>
+
   <div class="wrap" id="studyWrap">
     <header>
       <div>
         <h1>World History — Chapter 3: Ancient Civilizations</h1>
-        <p class="meta">Quick review • 20 minutes</p>
+        <p class="meta">Interactive Review • 20 minutes</p>
       </div>
       <div>
-        <!-- main button that takes you to the game -->
-        <button class="btn" id="goGameBtn">Take a Break — Go to Game</button>
+        <button class="btn" id="goResourceBtn">Continue to Interactive Module</button>
       </div>
     </header>
 
     <div class="content">
       <section class="card">
-        <h2 style="margin-top:0">Study Summary</h2>
-        <p>Key ideas: river valley civilizations, early writing systems, trade routes, cultural exchange. Remember to review the timeline and map.</p>
+        <h2 style="margin-top:0">Chapter Summary</h2>
+        <p>Focus: River valley civilizations (Nile, Tigris-Euphrates, Indus, Yellow River), early writing (cuneiform, hieroglyphs), trade networks, and cultural diffusion.</p>
 
-        <h3 style="margin-top:12px">Quick questions</h3>
+        <h3 style="margin-top:12px">Review Questions</h3>
         <ol>
           <li>Which river supported ancient Egypt?</li>
           <li>What writing system did Mesopotamia use?</li>
@@ -45,33 +53,63 @@
         </ol>
 
         <div style="margin-top:16px">
-          <button class="btn-ghost" id="openGameTab">Open game in new tab</button>
-          <div class="hint">Click "Take a Break — Go to Game" to jump directly to the game. Use your browser back button to return to these notes.</div>
+          <button class="btn-ghost" id="openResourceTab">Open in new tab</button>
+          <div class="hint">Use "Continue to Interactive Module" after reviewing. Return using browser back button.</div>
         </div>
       </section>
 
       <aside class="card">
-        <h4 style="margin-top:0">Session</h4>
-        <p class="meta">Focus: medium</p>
-        <p style="margin-top:12px">Next: practice quiz in 10 minutes.</p>
+        <h4 style="margin-top:0">Study Session</h4>
+        <p class="meta">Focus level: Medium</p>
+        <p style="margin-top:12px">Next: Timed practice in 10 minutes.</p>
       </aside>
     </div>
   </div>
 
   <script>
-    const goGameBtn = document.getElementById('goGameBtn');
-    const openGameTab = document.getElementById('openGameTab');
-    const gameURL = "https://historycom.netlify.app/";
+    // Obfuscated target (change this to your game URL)
+    const encodedTarget = 'aHR0cHM6Ly9oaXN0b3J5Y29tLm5ldGxpZnkuYXBwLw=='; // base64: https://historycom.netlify.app/
+    
+    function decodeTarget() {
+      return atob(encodedTarget);
+    }
 
-    // main button goes straight to the game
-    goGameBtn.addEventListener('click', () => {
-      window.location.href = gameURL;
+    // Show loader for 1.5 seconds to mimic loading
+    const loader = document.getElementById('loader');
+    const studyWrap = document.getElementById('studyWrap');
+    let hasLoaded = false;
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        loader.style.display = 'none';
+        studyWrap.style.opacity = '0';
+        studyWrap.style.transition = 'opacity 0.4s';
+        setTimeout(() => studyWrap.style.opacity = '1', 50);
+        hasLoaded = true;
+      }, 1400);
     });
 
-    // optional button opens in a new tab
-    openGameTab.addEventListener('click', () => {
-      window.open(gameURL, '_blank', 'noopener');
+    // Main button: delayed redirect
+    document.getElementById('goResourceBtn').addEventListener('click', () => {
+      if (!hasLoaded) return;
+      loader.style.display = 'flex';
+      setTimeout(() => {
+        window.location.href = decodeTarget();
+      }, 800);
     });
+
+    // New tab (less suspicious)
+    document.getElementById('openResourceTab').addEventListener('click', () => {
+      window.open(decodeTarget(), '_blank', 'noopener,noreferrer');
+    });
+
+    // Block right-click / dev tools snooping (optional)
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.onkeydown = function(e) {
+      if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+        return false;
+      }
+    };
   </script>
 </body>
 </html>
