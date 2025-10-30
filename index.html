@@ -16,28 +16,23 @@
     .btn{display:inline-block;padding:10px 14px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:700;cursor:pointer;text-decoration:none}
     .btn-ghost{background:transparent;border:1px solid rgba(37,99,235,0.12);color:var(--accent);padding:8px 12px;border-radius:8px}
     .hint{color:var(--muted);font-size:0.9rem;margin-top:10px}
-    /* Game view styles */
-    #gameView{display:none;height:100vh;width:100vw;position:fixed;inset:0;background:#000;z-index:9999;align-items:center;justify-content:center;flex-direction:column}
-    #gameFrame{width:min(100%,1200px);height:min(90vh,900px);border:0;border-radius:6px;background:#111}
-    .gameToolbar{width:100%;max-width:1200px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;color:white}
-    .backBtn{background:rgba(255,255,255,0.06);border:0;color:white;padding:8px 10px;border-radius:8px;cursor:pointer}
-    @media (max-width:880px){ .content{grid-template-columns:1fr} #gameFrame{width:100%;height:100vh;border-radius:0} .wrap{margin:0;border-radius:0;box-shadow:none} }
+    @media (max-width:880px){ .content{grid-template-columns:1fr} .wrap{margin:0;border-radius:0;box-shadow:none} }
   </style>
 </head>
 <body>
-  <div class="wrap" id="studyWrap" aria-live="polite">
+  <div class="wrap" id="studyWrap">
     <header>
       <div>
         <h1>World History — Chapter 3: Ancient Civilizations</h1>
         <p class="meta">Quick review • 20 minutes</p>
       </div>
       <div>
-        <!-- main button that "takes you to the game" -->
+        <!-- main button that takes you to the game -->
         <button class="btn" id="goGameBtn">Take a Break — Go to Game</button>
       </div>
     </header>
 
-    <div class="content" role="region" aria-label="Study content">
+    <div class="content">
       <section class="card">
         <h2 style="margin-top:0">Study Summary</h2>
         <p>Key ideas: river valley civilizations, early writing systems, trade routes, cultural exchange. Remember to review the timeline and map.</p>
@@ -51,7 +46,7 @@
 
         <div style="margin-top:16px">
           <button class="btn-ghost" id="openGameTab">Open game in new tab</button>
-          <div class="hint">Click "Take a Break — Go to Game" to jump directly to the game. Use the Back button on the game screen to return to these notes.</div>
+          <div class="hint">Click "Take a Break — Go to Game" to jump directly to the game. Use your browser back button to return to these notes.</div>
         </div>
       </section>
 
@@ -63,90 +58,20 @@
     </div>
   </div>
 
-  <!-- Fullscreen-ish game view (hidden until button click) -->
-  <div id="gameView" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="gameToolbar" role="toolbar">
-      <div style="display:flex;gap:12px;align-items:center">
-        <button class="backBtn" id="backBtn">← Back to Study</button>
-        <strong id="gameTitle" style="color:white">Cut the Rope — Game</strong>
-      </div>
-      <div style="color:rgba(255,255,255,0.85);font-size:0.9rem">Enjoy your break — close to return</div>
-    </div>
-
-    <!-- The iframe uses the exact src and sandbox you provided -->
-    <iframe
-      id="gameFrame"
-      src=""
-      data-src="https://historycom.netlify.app/"
-      title="Cut the Rope Game"
-      sandbox="allow-scripts allow-same-origin"
-      loading="lazy"
-    ></iframe>
-  </div>
-
   <script>
     const goGameBtn = document.getElementById('goGameBtn');
     const openGameTab = document.getElementById('openGameTab');
-    const studyWrap = document.getElementById('studyWrap');
-    const gameView = document.getElementById('gameView');
-    const gameFrame = document.getElementById('gameFrame');
-    const backBtn = document.getElementById('backBtn');
+    const gameURL = "https://historycom.netlify.app/";
 
-    // When clicked, replace the visible page with the game iframe (lazy-load src)
+    // main button goes straight to the game
     goGameBtn.addEventListener('click', () => {
-      // set iframe src only when user chooses to go
-      if (!gameFrame.src) gameFrame.src = gameFrame.dataset.src;
-      // hide study content and show the game view
-      studyWrap.style.display = 'none';
-      gameView.style.display = 'flex';
-      gameView.setAttribute('aria-hidden','false');
-      // optional: set focus to iframe container for accessibility
-      backBtn.focus();
-      // change history so back button in browser returns (so it behaves like a navigation)
-      history.pushState({view:'game'}, '', '#game');
+      window.location.href = gameURL;
     });
 
-    // Open the actual game in a new tab if requested
+    // optional button opens in a new tab
     openGameTab.addEventListener('click', () => {
-      const url = gameFrame.dataset.src || 'https://historycom.netlify.app/';
-      window.open(url, '_blank', 'noopener');
+      window.open(gameURL, '_blank', 'noopener');
     });
-
-    // Back to study notes: hide iframe and reveal study content
-    backBtn.addEventListener('click', () => {
-      gameFrame.src = ''; // optional: unload the game when leaving
-      gameView.style.display = 'none';
-      gameView.setAttribute('aria-hidden','true');
-      studyWrap.style.display = '';
-      studyWrap.scrollIntoView({behavior:'smooth'});
-      // remove the #game from URL
-      if (location.hash === '#game') history.back();
-    });
-
-    // Handle browser Back/Forward navigation
-    window.addEventListener('popstate', (e) => {
-      if (location.hash === '#game') {
-        // user navigated forward to game
-        if (!gameFrame.src) gameFrame.src = gameFrame.dataset.src;
-        studyWrap.style.display = 'none';
-        gameView.style.display = 'flex';
-        gameView.setAttribute('aria-hidden','false');
-      } else {
-        // no hash -> show study
-        gameFrame.src = '';
-        gameView.style.display = 'none';
-        gameView.setAttribute('aria-hidden','true');
-        studyWrap.style.display = '';
-      }
-    });
-
-    // If user lands on page with #game already, show the game immediately
-    if (location.hash === '#game') {
-      if (!gameFrame.src) gameFrame.src = gameFrame.dataset.src;
-      studyWrap.style.display = 'none';
-      gameView.style.display = 'flex';
-      gameView.setAttribute('aria-hidden','false');
-    }
   </script>
 </body>
 </html>
